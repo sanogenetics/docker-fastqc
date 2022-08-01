@@ -1,0 +1,31 @@
+#!/bin/bash
+set -e
+set -u
+set -x
+
+DEST="$1"
+READS="${@:2}"
+
+echo $DEST
+echo $READS
+
+mkdir -p input
+mkdir -p output
+
+# download from s3
+# convert the s3 names into local names
+# ~4GB WES x2 reads download in ~1m x2
+for READ in ${READS}; do
+  aws s3 cp $READ input/
+done
+
+
+# run fastqc
+# WES ~15m
+time fastqc --noextract --threads 2 --format fastq --outdir output/ --quiet input/*
+ls -l output/
+
+# upload to s3
+for OUTPUT in `ls output/*.zip`; do
+  aws s3 cp "${OUTPUT}" "${DEST}"
+done
