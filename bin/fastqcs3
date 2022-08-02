@@ -16,16 +16,22 @@ mkdir -p output
 # convert the s3 names into local names
 # ~4GB WES x2 reads download in ~1m x2
 for READ in ${READS}; do
-  aws s3 cp $READ input/
+  # dont display progress bar
+  echo "Copying ${READ} to input/"
+  time aws s3 cp --no-progress "${READ}" input/
+  echo "Copied ${READ} to input/"
 done
 
 
 # run fastqc
 # WES ~15m
+echo "Running FastQC"
 time fastqc --noextract --threads 2 --format fastq --outdir output/ --quiet input/*
-ls -l output/
+echo "Ran FastQC"
 
 # upload to s3
 for OUTPUT in `ls output/*.zip`; do
-  aws s3 cp "${OUTPUT}" "${DEST}"
+  echo "Copying ${OUTPUT} to ${DEST}"
+  time aws s3 cp --no-progress "${OUTPUT}" "${DEST}"
+  echo "Copied ${OUTPUT} to ${DEST}"
 done
