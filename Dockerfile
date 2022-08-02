@@ -44,8 +44,7 @@ RUN wget https://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.11.
 
 ENV PATH="/fastqc/FastQC:${PATH}"
 
-ENTRYPOINT ["fastqc", "--help"]
-
 # also install convenience scripts
 COPY bin/* /fastqc/
 RUN chmod 777 /fastqc/*
+ENV PATH="/fastqc:${PATH}"
